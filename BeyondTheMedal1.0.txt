@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BeyondTheMedal</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  /* =============================================
+     COLORS — change these to restyle the whole site
+  ============================================= */
+  :root {
+    --gold:       #3B82F6;
+    --gold-light: #F0D49A;
+    --gold-dark:  #7A5E1A;
+    --navy:       #3B82F6;
+    --white:      #ffffff;
+    --bg:         #fafaf8;
+    --surface:    #ffffff;
+    --surface2:   #f4f2ee;
+    --border:     #e0ddd6;
+    --text:       #111827;
+    --muted:      #6b6760;
+    --blue:       #185FA5;
+    --red-top:    #D9534F;
+    --green-top:  #5CB85C;
+    --bad:        #A32D2D;
+    --good:       #3B6D11;
+  }
+
+  /* =============================================
+     BASE
+  ============================================= */
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; color: var(--text); background: var(--bg); }
+  a { color: inherit; text-decoration: none; }
+
+  /* =============================================
+     NAV — edit site name and nav link labels below
+  ============================================= */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: .75rem 2rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--gold-dark); }
+  .nav-logo span { color: var(--text); }
+  .nav-links { display: flex; gap: 4px; flex-wrap: wrap; }
+  .nb {
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    padding: 6px 14px; border-radius: 20px;
+    border: 1px solid transparent; background: none;
+    cursor: pointer; color: var(--muted); transition: all .2s;
+  }
+  .nb:hover { color: var(--text); background: var(--surface2); }
+  .nb.active { color: var(--gold-dark); border-color: var(--gold); background: var(--surface2); font-weight: 500; }
+
+  /* =============================================
+     PAGES
+  ============================================= */
+  .page { display: none; }
+  .page.active { display: block; animation: fadein .3s ease; }
+  @keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* =============================================
+     HERO SECTION
+  ============================================= */
+  .hero {
+    padding: 3.5rem 2rem 3rem; text-align: center;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .rings { display: flex; justify-content: center; gap: 6px; margin-bottom: 1.25rem; }
+  .ring { width: 22px; height: 22px; border-radius: 50%; border: 3px solid; }
+  .r1{border-color:#3A7BD5} .r2{border-color:#E8B800} .r3{border-color:#555}
+  .r4{border-color:#4CAF50} .r5{border-color:#D9534F}
+  .hero h1 {
+    font-family: 'Playfair Display', serif; font-size: 36px; font-weight: 700;
+    line-height: 1.2; max-width: 560px; margin: 0 auto 1rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--gold-dark); }
+  .hero p { font-size: 16px; color: var(--muted); max-width: 500px; margin: 0 auto 2rem; line-height: 1.7; }
+  .hero-ctas { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+  .btn-p {
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    padding: 10px 24px; border-radius: 24px;
+    background: var(--navy); color: #fff; border: none; cursor: pointer; transition: opacity .2s;
+  }
+  .btn-p:hover { opacity: .85; }
+  .btn-o {
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+    padding: 10px 24px; border-radius: 24px;
+    background: none; color: var(--text); border: 1px solid var(--border); cursor: pointer; transition: background .2s;
+  }
+  .btn-o:hover { background: var(--surface2); }
+
+  /* =============================================
+     STAT STRIP
+  ============================================= */
+  .stat-strip { display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 1px solid var(--border); background: var(--surface); }
+  .stat-cell { padding: 1.5rem; text-align: center; border-right: 1px solid var(--border); }
+  .stat-cell:last-child { border-right: none; }
+  .stat-num { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 700; color: var(--gold-dark); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .4px; line-height: 1.4; }
+  .stat-src { font-size: 10px; color: var(--muted); margin-top: 4px; opacity: .7; }
+
+  /* =============================================
+     CONTENT SECTIONS
+  ============================================= */
+  .cs { padding: 2.5rem 2rem; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .cs:last-child { border-bottom: none; }
+  .stag {
+    display: inline-block; font-size: 11px; font-weight: 500; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--gold-dark);
+    background: var(--surface2); border: 1px solid var(--gold-light);
+    padding: 3px 10px; border-radius: 12px; margin-bottom: 12px;
+  }
+  .stitle { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; line-height: 1.3; margin-bottom: 12px; }
+  .sbody { font-size: 15px; color: var(--muted); line-height: 1.8; max-width: 660px; }
+  .sbody + .sbody { margin-top: 1rem; }
+
+  /* =============================================
+     QUOTE BLOCK
+  ============================================= */
+  .qblock {
+    margin: 1.5rem 0; padding: 1rem 1.25rem;
+    border-left: 3px solid var(--gold);
+    background: var(--surface2); border-radius: 0 8px 8px 0;
+    font-size: 15px; color: var(--text); line-height: 1.7;
+  }
+  .qsrc { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+  /* =============================================
+     CARDS
+  ============================================= */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 12px; margin-top: 1.5rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .ci-icon { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; font-size: 15px; }
+  .ib{background:#E6F1FB;color:#0C447C} .ig{background:#EAF3DE;color:#3B6D11}
+  .ia{background:#FAEEDA;color:#854F0B} .ip{background:#EEEDFE;color:#3C3489}
+  .card h3 { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+  /* =============================================
+     COMPARE GRID
+  ============================================= */
+  .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 1.5rem; }
+  .cc { padding: 1.25rem; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+  .cc.us  { border-top: 3px solid var(--red-top); }
+  .cc.world { border-top: 3px solid var(--green-top); }
+  .cc h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; }
+  .cr { font-size: 13px; color: var(--muted); padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .cr:last-child { border-bottom: none; }
+  .tag-bad  { color: var(--bad);  font-weight: 500; }
+  .tag-good { color: var(--good); font-weight: 500; }
+
+  /* =============================================
+     INFO BANNER
+  ============================================= */
+  .info-banner {
+    margin: 1.25rem 0; padding: 1rem 1.25rem;
+    border: 1px solid #B5D4F4; background: #E6F1FB;
+    border-radius: 12px; font-size: 14px; color: #0C447C; line-height: 1.7;
+  }
+  .info-banner strong { font-weight: 500; }
+
+  /* =============================================
+     VIDEO
+  ============================================= */
+.video-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.vid-wrap iframe {
+  width: 100%;
+  height: 250px;
+  border: none;
+}
+
+  .vid-wrap { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); max-width: 600px; margin-top: 1.25rem; }
+  .vid-wrap iframe { width: 100%; display: block; border: none; }
+  .vid-label { padding: .75rem 1rem; font-size: 13px; color: var(--muted); background: var(--surface2); line-height: 1.5; }
+  .vid-label strong { display: block; font-size: 14px; color: var(--text); font-weight: 500; margin-bottom: 3px; }
+
+  /* =============================================
+     DAY-IN-THE-LIFE BLOCK
+  ============================================= */
+  .day-block { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-top: 1.25rem; }
+  .day-time { font-size: 11px; font-weight: 500; color: var(--gold-dark); letter-spacing: .6px; text-transform: uppercase; margin-bottom: 4px; }
+  .day-entry { font-size: 14px; color: var(--text); line-height: 1.7; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+  .day-entry:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+  /* =============================================
+     HOW TO HELP — TIER LIST
+  ============================================= */
+  .tier { display: flex; gap: 1rem; align-items: flex-start; padding: 1.25rem; border: 1px solid var(--border); border-radius: 12px; margin-bottom: 10px; background: var(--surface); }
+  .tbadge { flex-shrink: 0; font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold-dark); width: 40px; text-align: center; padding-top: 2px; }
+  .tier h3 { font-size: 15px; font-weight: 500; margin-bottom: 5px; }
+  .tier p  { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .taction { margin-top: 8px; font-size: 12px; font-weight: 500; color: var(--gold-dark); cursor: pointer; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; display: inline-block; }
+
+  /* =============================================
+     CHECKLIST
+  ============================================= */
+  .checklist { margin-top: 1rem; }
+  .ck { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; font-size: 14px; color: var(--text); line-height: 1.6; }
+  .cm { flex-shrink: 0; margin-top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #EAF3DE; color: #3B6D11; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; }
+
+  /* =============================================
+     RESOURCES LIST
+  ============================================= */
+  .rl { margin-top: 1.25rem; }
+  .ri { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .ri:last-child { border-bottom: none; }
+  .rdot { flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; }
+  .db{background:#378ADD} .dg{background:#639922} .da{background:#BA7517} .dt{background:#1D9E75}
+  .ri h4 { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+  .ri p  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .rlink { display: inline-block; margin-top: 6px; font-size: 12px; color: var(--blue); font-weight: 500; cursor: pointer; background: none; border: none; padding: 0; font-family: 'DM Sans', sans-serif; }
+
+  /* =============================================
+     MEDAL CARDS
+  ============================================= */
+  .medal-card { border-radius: 12px; padding: 1.25rem; background: var(--surface); border: 1px solid var(--border); }
+  .medal-card h3 { font-size: 16px; margin-bottom: 6px; }
+  .medal-amount { font-size: 22px; font-weight: 500; color: var(--text); margin-top: 4px; }
+
+  /* =============================================
+     FOOTER
+  ============================================= */
+  .footer { padding: 1.5rem 2rem; text-align: center; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); line-height: 1.8; background: var(--surface); }
+
+  /* =============================================
+     RESPONSIVE
+  ============================================= */
+  @media (max-width: 600px) {
+    .hero h1 { font-size: 26px; }
+    .stat-strip { grid-template-columns: 1fr; }
+    .stat-cell { border-right: none; border-bottom: 1px solid var(--border); }
+    .compare-grid { grid-template-columns: 1fr; }
+    nav { padding: .75rem 1rem; }
+    .cs { padding: 2rem 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     NAV BAR
+     To rename the site: edit "Beyond" and "The" and "Medal" below
+     To rename nav tabs: edit the button text (About / Athlete Life / etc.)
+============================================= -->
+<nav>
+  <div class="nav-logo">Beyond<span>The</span>Medal</div>
+  <div class="nav-links">
+    <button class="nb active" onclick="sp('about',this)">About</button>
+    <button class="nb" onclick="sp('life',this)">Athlete Life</button>
+    <button class="nb" onclick="sp('help',this)">How to Help</button>
+    <button class="nb" onclick="sp('athletes',this)">For Athletes</button>
+  </div>
+</nav>
+
+
+<!-- =============================================
+     PAGE 1: ABOUT
+============================================= -->
+<div class="page active" id="page-about">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="rings">
+      <div class="ring r1"></div><div class="ring r2"></div>
+      <div class="ring r3"></div><div class="ring r4"></div><div class="ring r5"></div>
+    </div>
+    <!-- EDIT: Main headline -->
+    <h1>They train full time.<br><em>Most earn almost nothing.</em></h1>
+    <!-- EDIT: Subheading paragraph -->
+    <p>U.S. Olympic athletes represent their country at the world's biggest stage, yet many struggle to cover basic living expenses while doing so, with zero government funding.</p>
+    <div class="hero-ctas">
+      <button class="btn-p" onclick="sp('life',document.querySelectorAll('.nb')[1])">What it's really like</button>
+      <button class="btn-o" onclick="sp('help',document.querySelectorAll('.nb')[2])">See how to help</button>
+    </div>
+  </div>
+
+  <!-- STATS STRIP -->
+  <div class="stat-strip">
+    <!-- EDIT: Change the number, label, and source for each stat -->
+    <div class="stat-cell">
+      <div class="stat-num">26.5%</div>
+      <div class="stat-label">of pipeline athletes earn under $15K per year</div>
+      <div class="stat-src">Congressional Commission, 2024</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">$12K</div>
+      <div class="stat-label">average annual competition costs per athlete</div>
+      <div class="stat-src">Congressional Commission, 2024</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num">$497M</div>
+      <div class="stat-label">USOPC revenue in 2024, athletes saw little of it</div>
+      <div class="stat-src">USOPC tax filings, 2025</div>
+    </div>
+  </div>
+
+  <!-- SECTION: THE PROBLEM -->
+  <div class="cs">
+    <div class="stag">The problem</div>
+    <!-- EDIT: Section title -->
+    <h2 class="stitle">A system built on sponsorships and luck</h2>
+    <!-- EDIT: Body text -->
+    <p class="sbody">Unlike countries such as the United Kingdom and China, the U.S. government provides no direct funding to its Olympic athletes. Athletes rely on private sponsorships, grants, or personal savings. This system rewards visibility over talent only the most marketable and popular athletes attract major deals, while many others receive nothing.</p>
+    <div class="qblock">
+      <!-- EDIT: Quote text -->
+      A 2024 congressional report surveyed roughly 1,000 American athletes in the Olympic and Paralympic pipeline and found that 26.5% reported individual incomes under $15,000 a year while average annual competition costs run about $12,000.
+      <div class="qsrc">Commission on the State of U.S. Olympics & Paralympics, 2024. The Wall Street Journal</div>
+    </div>
+    <p class="sbody">Meanwhile, the USOPC generated $497 million in revenue in 2024, its highest ever, while its CEO earned $1.25 million in total compensation. The gap between company wealth and athlete income reflect a contradiction for the U.S. Olympic sports.</p>
+  </div>
+
+  <!-- SECTION: FOUR CORE PROBLEMS -->
+  <div class="cs">
+    <div class="stag">Why it's an inequality issue</div>
+    <h2 class="stitle">Four core problems</h2>
+    <div class="card-grid">
+      <!-- EDIT: Each card has an icon, title, and description -->
+      <div class="card"><div class="ci-icon ib">⏱</div><h3>Full time commitment</h3><p>Olympic training is to many a full time job, often 20–35+ hours per week. Leaving little room for them to get an actual job.</p></div>
+      <div class="card"><div class="ci-icon ia">📉</div><h3>Unstable income</h3><p>Sponsorships favor visibility. Medal bonuses ($37,500 gold / $22,500 silver / $15,000 bronze) reach a very small percentage of athletes who compete.</p></div>
+      <div class="card"><div class="ci-icon ip">🎓</div><h3>Long term sacrifice</h3><p>Athletes often retire as young as 25–30 with little to no savings, having spent their prime earning years training instead of building careers.</p></div>
+      <div class="card"><div class="ci-icon ig">🌍</div><h3>Global disadvantage</h3><p>U.S. athletes compete against rivals from countries with direct government stipends. Great Britain, for example, provides athletes about $36,000 per year to train.</p></div>
+    </div>
+  </div>
+
+  <!-- SECTION: STEVENS AWARDS UPDATE -->
+  <div class="cs">
+    <div class="stag">A 2025 change</div>
+    <h2 class="stitle">The Stevens Awards a private solution to a public problem</h2>
+    <div class="info-banner">
+      <!-- EDIT: Banner text -->
+      <strong>Announced March 2025:</strong> Entrepreneur Ross Stevens donated $100 million to the USOPC, its largest-ever single gift. Starting with the 2026 Milan-Cortina Winter Games, every qualifying U.S. Olympic and Paralympic athlete earning under $1M/year will receive $200,000 in deferred financial benefits per Games. $100K becomes available at age 45 (or 20 years after competing); $100K is a guaranteed death benefit for the athlete's family. Awards stack across multiple Games.
+    </div>
+    <p class="sbody">This is a meaningful step, but it is private philanthropy, not government policy, and the benefits are deferred rather than immediate. Athletes still face financial hardship during their active careers. The need for structural reform remains.</p>
+  </div>
+
+  <!-- SECTION: COUNTRY COMPARISON -->
+  <div class="cs">
+    <div class="stag">Country comparison</div>
+    <h2 class="stitle">U.S. vs. the rest of the world</h2>
+    <div class="compare-grid">
+      <div class="cc us">
+        <!-- EDIT: US column rows -->
+        <h3>United States</h3>
+        <div class="cr">Government funding <span class="tag-bad">None</span></div>
+        <div class="cr">Funding model <span class="tag-bad">Private/sponsorship</span></div>
+        <div class="cr">Active-career stability <span class="tag-bad">Very low</span></div>
+        <div class="cr">Coverage breadth <span class="tag-bad">Top athletes only</span></div>
+      </div>
+      <div class="cc world">
+        <!-- EDIT: World column rows -->
+        <h3>UK / China / Others</h3>
+        <div class="cr">Government funding <span class="tag-good">Direct</span></div>
+        <div class="cr">Funding model <span class="tag-good">State-supported</span></div>
+        <div class="cr">Active-career stability <span class="tag-good">High</span></div>
+        <div class="cr">Coverage breadth <span class="tag-good">Broad athlete base</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    BeyondTheMedal - raising awareness about financial inequality in U.S. Olympic sports.<br>
+    Sources: Congressional Commission on U.S. Olympics &amp; Paralympics (2024) · USOPC · Wall Street Journal · Sportico · Kiplinger
+  </div>
+</div><!-- end page-about -->
+
+
+<!-- =============================================
+     PAGE 2: ATHLETE LIFE
+============================================= -->
+<div class="page" id="page-life">
+
+  <div class="hero">
+    <div class="rings">
+      <div class="ring r1"></div><div class="ring r2"></div>
+      <div class="ring r3"></div><div class="ring r4"></div><div class="ring r5"></div>
+    </div>
+    <h1>What it's actually like<br><em>to be an Olympian.</em></h1>
+    <p>Before the medals and the opening ceremonies there are years of sacrifice, exhaustion, and financial stress that most people never see.</p>
+  </div>
+
+<div class="cs">
+  <div class="stag">Watch</div>
+  <h2 class="stitle">Hear it from athletes directly</h2>
+
+  <!-- VIDEO GRID -->
+  <div class="video-grid">
+
+    <!-- VIDEO 1 -->
+    <div class="vid-wrap">
+      <iframe 
+        src="https://www.youtube.com/embed/vcqfbT1WPTg"
+        title="Why Olympic Athletes Are Poor"
+        allowfullscreen>
+      </iframe>
+      <div class="vid-label">
+        <strong>Why Olympic Athletes Are Poor</strong>
+       10,000 athletes float down the Seine for the 2024 Olympics opening ceremony, while nearby, McDonald's workers flip burgers. Who earns more? Surprisingly, the McDonald's worker makes almost 50% more than the average Olympian.
+      </div>
+    </div>
+
+    <!-- VIDEO 2 -->
+     <div class="vid-wrap">
+      <iframe 
+        src="https://www.youtube.com/embed/ZatBRfMnxUE"
+        allowfullscreen>
+      </iframe>
+      <div class="vid-label">
+        <strong>Why Olympians struggle financially</strong>
+        Shows how many athletes still need jobs despite competing at the highest level.
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  <!-- DAY IN THE LIFE -->
+  <div class="cs">
+    <div class="stag">A real training day</div>
+    <h2 class="stitle">One day in the life of an Olympic rower</h2>
+    <p class="sbody">
+      Kristin Hedstrom competed at the 2012 London Olympics and won silver at the 2013 World Championships in the lightweight double. She kept a detailed training log every single day for nearly 15 years. The entry below is from <strong>Wednesday, October 9, 2013</strong>, ten days before a major race.
+      <a href="https://kristinhedstrom.com/995/day-in-the-life-olympic-athlete/" target="_blank" style="color:#185FA5;font-weight:500"> Read the full post on her website →</a>
+    </p>
+    <div class="day-block">
+      <!-- EDIT: Each time block has a time label and description -->
+      <div class="day-entry">
+        <div class="day-time">5:30 AM -> Wake up</div>
+        Daily weigh-in first thing (lightweight rowers must average under 57 kg / 125.7 lbs, with no individual over 59 kg). She blends a banana-almond butter protein shake, checks wind and tides on her phone, and bikes 2 miles to the boathouse in the dark.
+      </div>
+      <div class="day-entry">
+        <div class="day-time">6:00 AM -> Warm-up & launch</div>
+        A 12-minute warm-up jog in the dark with a flashlight. Seven-exercise dynamic warm-up in the boat bay. On the water by 6:30 AM for an all-out 4km race-pace scrimmage against teammates.
+      </div>
+      <div class="day-entry">
+        <div class="day-time">7:00–8:00 AM -> Race + cooldown</div>
+        An 18-minute racing piece into the wind and against the tide. Then 30 minutes of cooldown rowing. Total morning mileage: 14.5km on the water.
+      </div>
+      <div class="day-entry">
+        <div class="day-time">8:00–9:30 AM -> Run + recovery</div>
+        A 53-minute run with a teammate immediately after rowing. Back to the boathouse to stretch and eat, on the locker room floor, while most teammates have already left for their jobs.
+      </div>
+      <div class="day-entry">
+        <div class="day-time">Afternoon -> Second full session</div>
+        Another complete training block in the afternoon. This is not a special occasion, this is a normal Wednesday.
+      </div>
+    </div>
+    <div class="qblock" style="margin-top:1.5rem">
+      "Training at that level requires two to three practices a day and pushing your body's limits of strength and endurance. Layer days on days and weeks on weeks of that and you're not exactly bounding up every set of stairs you see."
+      <div class="qsrc"> Kristin Hedstrom, 2012 Olympian and 2013 World Championship silver medalist</div>
+    </div>
+  </div>
+
+  <!-- TRAINING NUMBERS -->
+  <div class="cs">
+    <div class="stag">By the numbers</div>
+    <h2 class="stitle">The scale of Olympic training</h2>
+    <div class="card-grid">
+      <div class="card"><div class="ci-icon ib">📅</div><h3>20–35+ hours per week</h3><p>Simone Biles trained about 32 hours per week. Endurance athletes average 13–17 hours at minimum. This is a full-time job.</p></div>
+      <div class="card"><div class="ci-icon ia">🏊</div><h3>Twice-daily sessions</h3><p>Olympic swimmers practice twice a day, 5–6 hours in the pool, swimming 12–14 km daily, not counting gym, nutrition, and recovery work.</p></div>
+      <div class="card"><div class="ci-icon ig">📆</div><h3>4–8 years to make a team</h3><p>It is common for Olympic athletes to spend four to eight years in intensive training before making an Olympic team, often beginning as children.</p></div>
+      <div class="card"><div class="ci-icon ip">😴</div><h3>8–10 hours of sleep required</h3><p>Recovery is training. Elite athletes prioritize 8–10 hours of sleep per night alongside strict nutrition, physical therapy, and mental conditioning.</p></div>
+    </div>
+  </div>
+
+  <!-- FINANCIAL REALITY -->
+  <div class="cs">
+    <div class="stag">The financial reality</div>
+    <h2 class="stitle">Training this hard, and atlethes still struggle</h2>
+    <p class="sbody">Because Olympic training is a full-time job, athletes have almost no time for traditional employment. Without government support, many must find ways to earn income on top of their training load. Financial stability becomes a competitive advantage in itself.</p>
+    <div class="qblock">
+      Cyclist Kristen Faulkner, one of the biggest success stories of the 2024 Olympics, had to respond to work emails at 6am and attend Zoom meetings until midnight during a 7-day stage race in France just to maintain an income while training. "At times I did not have time to shower until 11pm or eat anything more than a baguette and protein shake for dinner."
+      <div class="qsrc"> Kristen Faulkner's personal blog, reported by Sherwood News, 2024</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    BeyondTheMedal - raising awareness about financial inequality in U.S. Olympic sports.<br>
+    Sources: Kristin Hedstrom (kristinhedstrom.com) · Sherwood News · HelloGiggles / Forbes training data
+  </div>
+</div><!-- end page-life -->
+
+
+<!-- =============================================
+     PAGE 3: HOW TO HELP
+============================================= -->
+<div class="page" id="page-help">
+
+  <div class="hero">
+    <div class="rings">
+      <div class="ring r1"></div><div class="ring r2"></div>
+      <div class="ring r3"></div><div class="ring r4"></div><div class="ring r5"></div>
+    </div>
+    <h1>Every action <em>matters.</em></h1>
+    <p>You don't need to be a senator or a sponsor to make a real difference. Here are concrete ways to support U.S. Olympic athletes.</p>
+  </div>
+
+  <div class="cs">
+
+    <div class="stag">Ways to help</div>
+    <h2 class="stitle">What you can do today</h2>
+
+    <!-- EDIT: Each tier has a number, title, description, and optional action button/link -->
+
+    <div class="tier">
+  <div class="tbadge">1</div>
+  <div>
+    <h3>Donate directly to athletes</h3>
+    <p>
+      Many athletes crowdfund training costs through GoFundMe or their personal websites.
+      Even a small contribution can cover equipment, travel, or coaching fees for a week.
+    </p>
+
+    <a 
+      href="https://www.gofundme.com/discover/olympic-athletes"
+      target="_blank"
+      class="taction">
+      Find athletes to donate to ↗
+    </a>
+  </div>
+</div>
+
+
+<div class="tier">
+  <div class="tbadge">2</div>
+  <div>
+    <h3>Support USOPC athlete programs</h3>
+    <p>
+      The USOPC distributes nearly $2.5 million annually in grants covering education,
+      training, travel, and medical care. Donating helps expand who qualifies.
+    </p>
+
+    <a 
+      href="https://www.usopc.org/grantsandfunding"
+      target="_blank"
+      class="taction">
+      See USOPC grant programs →
+    </a>
+  </div>
+</div>
+
+
+<div class="tier">
+  <div class="tbadge">3</div>
+  <div>
+    <h3>Amplify their stories</h3>
+    <p>
+      Visibility is directly tied to sponsorship. When athletes gain attention,
+      brands take notice. Sharing their journeys can make a real difference.
+    </p>
+
+    <a 
+      href="https://www.teamusa.org/news"
+      target="_blank"
+      class="taction">
+      Explore athlete stories ↗
+    </a>
+  </div>
+</div>
+
+
+<div class="tier">
+  <div class="tbadge">4</div>
+  <div>
+    <h3>Support sponsors who back lesser-known athletes</h3>
+    <p>
+      When brands support athletes who are not widely known, choosing to support
+      those companies helps create incentives for broader and more equal funding.
+    </p>
+
+    <a 
+      href="https://www.google.com/search?q=brands+that+sponsor+olympic+athletes"
+      target="_blank"
+      class="taction">
+      Find supporting brands ↗
+    </a>
+  </div>
+</div>
+
+  <!-- CHECKLIST -->
+  <div class="cs">
+  <h2>Support lesser known U.S. athletes</h2>
+
+  <p class="sbody">
+    Many U.S. Olympic athletes are self-funded and rely on public support to continue training.
+    These are real athletes currently raising money to compete.
+  </p>
+
+  <div class="grid">
+
+    <div class="card">
+      <h3>Veronica Fraley (Track & Field)</h3>
+      <p>
+        2024 Olympian working to continue her professional career.
+        Needs support for training and competition expenses.
+      </p>
+      <a href="https://www.gofundme.com/f/fuel-veronica-fraleys-track-and-field-journey" target="_blank">
+        Support Veronica ↗
+      </a>
+    </div>
+
+<div class="card">
+      <h3>Josh Williamson (Track & Field)</h3>
+      <p>
+        U.S. Olympic athlete working to return to competition after knee surgery.
+        Needs support for recovery, training, and getting back to the elite level.
+      </p>
+      <a href="https://www.gofundme.com/f/us-olympian-josh-williamsons-return-from-knee-surgery" target="_blank">
+        Support Josh ↗
+      </a>
+    </div>
+
+    <!-- Athlete 2 -->
+    <div class="card">
+      <h3>Chris Lillis (Freestyle Skiing)</h3>
+      <p>
+        U.S. Olympic aerial skier with family fundraising support to attend
+        competitions and continue representing Team USA.
+      </p>
+      <a href="https://www.gofundme.com/f/help-the-lillis-family-cheer-chris-in-italy" target="_blank">
+        Support Chris ↗
+      </a>
+    </div>
+
+
+    <div class="card">
+      <h3>Garrett Scantling (Decathlon)</h3>
+      <p>
+        Olympian working toward 2028. Raising funds to continue competing
+        at the highest level.
+      </p>
+      <a href="https://www.gofundme.com/f/support-garrett-scantlings-return-to-the-world-stage" target="_blank">
+        Support Garrett ↗
+      </a>
+    </div>
+
+    <div class="card">
+      <h3>U.S. Bobsled Athletes</h3>
+      <p>
+        Many bobsled athletes are entirely self-funded and rely on donations
+        to cover equipment, travel, and training costs.
+      </p>
+      <a href="https://www.gofundme.com/f/support-olympic-hopeful-karens-jounrey-in-team-usa-bobsled" target="_blank">
+        Support a bobsled athlete ↗
+      </a>
+    </div>
+
+  </div>
+</div>
+
+</div>
+
+<div class="cs">
+  <div class="stag">Why it matters</div>
+    <h2 class="stitle">The real impact of support</h2>
+    <div class="checklist">
+      <!-- EDIT: Add, remove, or change checklist items -->
+      <div class="ck"><div class="cm">✓</div>Athletes can focus fully on training instead of working second jobs or managing emails at midnight during competitions</div>
+      <div class="ck"><div class="cm">✓</div>Talent from lower-income backgrounds gets a real shot at the Olympics, not just those who can already afford the costs</div>
+      <div class="ck"><div class="cm">✓</div>U.S. athletes compete on more equal footing with government-funded rivals from other countries</div>
+      <div class="ck"><div class="cm">✓</div>The next generation isn't discouraged from pursuing Olympic sports due to financial barriers</div>
+      <div class="ck"><div class="cm">✓</div>Financial stress stops affecting performance, mental health, and how long athletes can sustain their careers</div>
+    </div>
+  </div>
+
+  <div class="footer">BeyondTheMedal — raising awareness about financial inequality in U.S. Olympic sports.</div>
+</div><!-- end page-help -->
+
+
+<!-- =============================================
+     PAGE 4: FOR ATHLETES (FIXED)
+============================================= -->
+<div class="page" id="page-athletes">
+
+  <div class="hero">
+    <div class="rings">
+      <div class="ring r1"></div><div class="ring r2"></div>
+      <div class="ring r3"></div><div class="ring r4"></div><div class="ring r5"></div>
+    </div>
+    <h1>You deserve <em>real support.</em></h1>
+    <p>
+      If you're a U.S. Olympic or aspiring Olympic athlete, here are real resources
+      to help you fund your training and build your career.
+    </p>
+  </div>
+
+  <!-- FUNDING -->
+  <div class="cs">
+    <div class="stag">Funding</div>
+    <h2 class="stitle">Real funding opportunities</h2>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <h3>USOPC Grants</h3>
+        <p>Funding for training, travel, education, and medical needs.</p>
+        <a href="https://www.usopc.org/grantsandfunding" target="_blank">Apply here ↗</a>
+      </div>
+
+      <div class="card">
+        <h3>Team USA Resources</h3>
+        <p>Programs and benefits available to Team USA athletes.</p>
+        <a href="https://www.teamusa.org/athlete-resources" target="_blank">View resources ↗</a>
+      </div>
+
+      <div class="card">
+        <h3>Crowdfunding</h3>
+        <p>Many athletes raise money directly from their communities.</p>
+        <a href="https://www.gofundme.com/discover/olympic-athletes" target="_blank">
+          Explore fundraisers ↗
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SUPPORT PROGRAMS -->
+  <div class="cs">
+    <div class="stag">Programs</div>
+    <h2 class="stitle">Additional support options</h2>
+
+    <div class="rl">
+
+      <div class="ri">
+        <div class="rdot db"></div>
+        <div>
+          <h4>National Governing Bodies</h4>
+          <p>Each sport has its own organization that may offer stipends and support.</p>
+          <a class="rlink" href="https://www.google.com/search?q=USA+Olympic+National+Governing+Bodies" target="_blank">
+            Find your NGB ↗
+          </a>
+        </div>
+      </div>
+
+      <div class="ri">
+        <div class="rdot dg"></div>
+        <div>
+          <h4>Army World Class Athlete Program</h4>
+          <p>Train full time while receiving military pay and benefits.</p>
+          <a class="rlink" href="https://www.armywcap.com/" target="_blank">
+            Learn about WCAP ↗
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SELF FUNDING -->
+  <div class="cs">
+    <div class="stag">Build your own support</div>
+    <h2 class="stitle">Ways to fund your career</h2>
+
+    <div class="card-grid">
+
+      <div class="card">
+        <h3>Build a personal brand</h3>
+        <p>Share your training journey online to attract sponsors.</p>
+        <a href="https://www.google.com/search?q=how+athletes+get+sponsorships" target="_blank">
+          Learn how ↗
+        </a>
+      </div>
+
+      <div class="card">
+        <h3>Find local sponsors</h3>
+        <p>Local businesses often support athletes in their community.</p>
+        <a href="https://www.google.com/search?q=how+to+find+sponsors+as+an+athlete" target="_blank">
+          Get tips ↗
+        </a>
+      </div>
+
+      <div class="card">
+        <h3>Offer coaching</h3>
+        <p>Coaching or clinics can provide income while you train.</p>
+        <a href="https://www.google.com/search?q=how+athletes+make+money+coaching" target="_blank">
+          Learn more ↗
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REALITY -->
+  <div class="cs">
+    <div class="stag">Reality</div>
+    <h2 class="stitle">You are not alone</h2>
+
+    <p class="sbody">
+      Many U.S. Olympic athletes train full time without stable income.
+      Financial struggle is not a personal failure, it is part of the system.
+    </p>
+
+    <div style="margin-top:1rem;">
+      <a href="https://www.google.com/search?q=Olympic+athlete+advocacy+groups+USA" 
+         target="_blank" 
+         class="btn-p"
+         style="text-decoration:none;">
+        Find advocacy groups ↗
+      </a>
+    </div>
+  </div>
+</div>
+
+
+
+</div>
+
+
+<!-- =============================================
+     JAVASCRIPT — navigation logic (no need to edit)
+============================================= -->
+<script>
+function sp(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+
+</body>
+</html>
